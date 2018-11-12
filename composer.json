@@ -1,0 +1,6 @@
+{
+    "require": {
+        "brianmcdo/image-palette": "dev-master",
+        "jwilsson/spotify-web-api-php": "^2.6"
+    }
+}
