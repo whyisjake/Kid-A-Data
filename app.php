@@ -2,9 +2,14 @@
 
 require 'vendor/autoload.php';
 
-// Fetch the saved access token from somewhere. A database for example.
+$session = new SpotifyWebAPI\Session(
+    '',
+    ''
+);
 
-$accessToken = 'BQCHl37SxTaDqS8Je7sgdAT2vuVOpKz_PJt2WChSfbhSIlQzBWDuPgjcNTSxyWbeXGr7O7GI33ktQ2jsqho';
+$session->requestCredentialsToken();
+$accessToken = $session->getAccessToken();
+
 $api = new SpotifyWebAPI\SpotifyWebAPI();
 $api->setAccessToken($accessToken);
 
@@ -34,12 +39,6 @@ foreach ( $data as $albumData ) {
     $filename = preg_replace("/[^a-z0-9\.]/", "", strtolower( $albumData['album'] ) );
     $albumData['@art'] = sprintf( 'tmp/%s.jpg', $filename );
 
-    // printf( 'Search Params: %s - %s<br>', $albumData['artist'], $albumData['album'] );
-    // printf( 'Artist Name: %s<br>', $album->artists[0]->name);
-    // printf( 'Album Name: %s<br>', $album->name);
-    // printf( 'Release Date: %s<br>', $album->release_date );
-    // printf( 'Album Art URL: %s<br>', $album->images[0]->url );
-
     // Save the album art
     getAlbumArt( $album->images[0]->url, sprintf( '%s.jpg', $filename ) );
 
@@ -60,22 +59,22 @@ foreach ( $data as $albumData ) {
     }
 }
 
+// Start the CSV Output
 $output = fopen("php://output",'w') or die("Can't open php://output");
 header("Content-Type:application/csv");
 header("Content-Disposition:attachment;filename=albumData.csv");
 
+// Output the header.
 $headers = array('artist', 'album', 'number', 'decade', 'count', 'primaryColor', 'secondaryColor', '@art', 'searchParam', '@url' );
 fputcsv( $output, $headers );
 
 foreach($newData as $product) {
     fputcsv($output, $product);
 }
-fclose($output) or die("Can't close php://output");
 
+// We done here...
+fclose( $output ) or die( "Can't close php://output" );
 
-function getAlbum() {
-
-}
 
 /**
  *
@@ -85,29 +84,9 @@ function getAlbumArt( $url = '', $name = '' ) {
     file_put_contents( $img, file_get_contents( $url ) );
 }
 
-function getArtistInfo() {
-
-}
-
-function getArtistArt() {
-
-}
-
-function saveImage() {
-
-}
-
 
 function getImageColor( $url ) {
     // initiate with image
     $palette = new \BrianMcdo\ImagePalette\ImagePalette( $url );
     return $palette->colors;
-}
-
-function getPrimaryColor() {
-
-}
-
-function getSecondaryColor() {
-
 }
